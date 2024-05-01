@@ -1,9 +1,5 @@
 #include <Bluepad32.h>
-#include <esp_now.h>
-#include <WiFi.h>
 #include <Adafruit_NeoPixel.h>
-
-#define CHANNEL 0
 
 // IO Interface Definitions
 #define LED_DataPin 12
@@ -52,12 +48,12 @@ const int PWM_FREQUENCY = 20000;
 const int PWM_RESOLUTION = 8;
 
 // Process joystick input and calculate motor speeds
-const int DEAD_BAND = 20;
+const int DEAD_BAND = 50;
 const float TURN_RATE = 1.5;
 int Motor_FrontLeft_SetValue, Motor_FrontRight_SetValue, Motor_BackLeft_SetValue, Motor_BackRight_SetValue = 0;
 void Motion_Control(int LY_Axis, int LX_Axis, int RX_Axis) {
   int FrontLeft_TargetValue, FrontRight_TargetValue, BackLeft_TargetValue, BackRight_TargetValue = 0;
-  int ForwardBackward_Axis = LY_Axis;
+  int ForwardBackward_Axis = -LY_Axis;
   int TurnLeftRight_Axis = -RX_Axis;
 
   //Set deadband
@@ -79,10 +75,10 @@ void Motion_Control(int LY_Axis, int LX_Axis, int RX_Axis) {
   }
 
   //constrain to joystick range
-  FrontLeft_TargetValue = constrain(FrontLeft_TargetValue, -127, 127);
-  BackLeft_TargetValue = constrain(BackLeft_TargetValue, -127, 127);
-  FrontRight_TargetValue = constrain(FrontRight_TargetValue, -127, 127);
-  BackRight_TargetValue = constrain(BackRight_TargetValue, -127, 127);
+  FrontLeft_TargetValue = constrain(FrontLeft_TargetValue, -512, 512);
+  BackLeft_TargetValue = constrain(BackLeft_TargetValue, -512, 512);
+  FrontRight_TargetValue = constrain(FrontRight_TargetValue, -512, 512);
+  BackRight_TargetValue = constrain(BackRight_TargetValue, -512, 512);
 
   //set motor speed through slew rate function
   Motor_FrontLeft_SetValue = SlewRateFunction(FrontLeft_TargetValue, Motor_FrontLeft_SetValue);
@@ -98,7 +94,7 @@ int SlewRateFunction(int Input_Target, int Input_Current) {
   int speedDiff = Input_Target - Input_Current;
   if (speedDiff > 0) Input_Current += min(speedDiff, SLEW_RATE_MS);
   else if (speedDiff < 0) Input_Current -= min(-speedDiff, SLEW_RATE_MS);
-  Input_Current = constrain(Input_Current, -127, 127);
+  Input_Current = constrain(Input_Current, -512, 512);
   return Input_Target;  //// BYPASSED
 }
 
@@ -111,8 +107,8 @@ const int STOP = 0;
 bool INVERT = false;
 void Set_Motor_Output(int Output, int Motor_ChA, int Motor_ChB) {
   if (INVERT) Output = -Output;
-  Output = constrain(Output, -127, 127);
-  int Mapped_Value = map(abs(Output), 0, 127, MIN_STARTING_SPEED, MAX_SPEED);
+  Output = constrain(Output, -512, 512);
+  int Mapped_Value = map(abs(Output), 0, 512, MIN_STARTING_SPEED, MAX_SPEED);
   int A, B = 0;
   if (Output < -DEAD_BAND) {  // Rotate Clockwise
     A = 0;
@@ -310,7 +306,6 @@ void setup() {
   pinMode(SwitchPin, INPUT_PULLUP);
   pinMode(MotorEnablePin, OUTPUT);
 
-  //attachInterrupt(SwitchPin, handleInterrupt, CHANGE);
 
   for (int i = 0; i < 6; i++) {
     pinMode(motorPins_A[i], OUTPUT);
