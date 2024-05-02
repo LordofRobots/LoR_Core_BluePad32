@@ -197,7 +197,7 @@ void onDisconnectedController(ControllerPtr ctl) {
 void dumpGamepad(ControllerPtr ctl) {
   Serial.printf(
     "idx=%d, dpad: 0x%02x, buttons: 0x%04x, axis L: %4d, %4d, axis R: %4d, %4d, brake: %4d, throttle: %4d, "
-    "misc: 0x%02x, gyro x:%6d y:%6d z:%6d, accel x:%6d y:%6d z:%6d\n",
+    "misc: 0x%02x, gyro x:%6d y:%6d z:%6d, accel x:%6d y:%6d z:%6d BATT:%6d\n",
     ctl->index(),        // Controller Index
     ctl->dpad(),         // D-pad
     ctl->buttons(),      // bitmask of pressed buttons
@@ -213,7 +213,8 @@ void dumpGamepad(ControllerPtr ctl) {
     ctl->gyroZ(),        // Gyro Z
     ctl->accelX(),       // Accelerometer X
     ctl->accelY(),       // Accelerometer Y
-    ctl->accelZ()        // Accelerometer Z
+    ctl->accelZ(),        // Accelerometer Z
+    ctl->battery()       // Battery level
   );
 }
 
