@@ -7,8 +7,11 @@
  
 *Dependencies*
 Based on the following:
+
    BluePad32 Library _ https://bluepad32.readthedocs.io/en/stable/
+
    LoR Library - please install the LoR library - https://github.com/LordofRobots/LoR
+
    Adafuit Neopixel library - install from the arduino library manager
 
 
