@@ -4,8 +4,12 @@
  Our User Guide / documentation for getting your MiniBot running with BluePad32
   - https://tr.ee/t8cqMRw3Hu
 
- Based on the following:
-  - BluePad32 Library _ https://bluepad32.readthedocs.io/en/stable/
+ 
+*Dependencies*
+Based on the following:
+   BluePad32 Library _ https://bluepad32.readthedocs.io/en/stable/
+   LoR Library - please install the LoR library - https://github.com/LordofRobots/LoR
+   Adafuit Neopixel library - install from the arduino library manager
 
 
 *known issues*
