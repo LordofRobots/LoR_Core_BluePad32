@@ -6,16 +6,16 @@
 
  
 *Dependencies*
-Based on the following:
 
-   BluePad32 Library _ https://bluepad32.readthedocs.io/en/stable/
+- Based on the BluePad32 Library _ https://bluepad32.readthedocs.io/en/stable/
 
-   LoR Library - please install the LoR library - https://github.com/LordofRobots/LoR
+- LoR Library - please install the LoR library - https://github.com/LordofRobots/LoR
 
-   Adafuit Neopixel library - install from the arduino library manager
+- Adafuit Neopixel library - install from the arduino library manager
 
 
-*known issues*
+
+*Known Issues*
 
 - TDSB network admin (on both wifi and lan) seem to block access to some third party libraries that Arduino IDE uses. This will cause issues when installing and updating your libraries. If you are having trouble installing or updating, it is best to connect to the internet on a private network to install and update these items.
 
