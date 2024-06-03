@@ -1,57 +1,48 @@
-//20240601
-//
-//
+/**
+ * fLoR_Core_BluePad32.ino
+ * 
+ * Description:
+ * This project file integrates the LoR (Lord of Robots) library to control a robotic platform
+ * equipped with wheels, utilizing joystick input for dynamic movement control and LED feedback. 
+ * It features motion control via a wheel drive mechanism, which allows for movement 
+ * . This implementation utilizes the LoR library to handle complex
+ * input and output operations, including motor control and serial communication.
+ * 
+ * Key Features:
+ * - rive Control: Enables movement using joystick inputs.
+ * - Motor Speed Control: Uses a slew rate control function to manage acceleration and deceleration smoothly.
+ * - LED Feedback System: Controls an Adafruit NeoPixel LED strip to provide visual feedback based on the system status.
+ * - Gamepad Support: Integrates with Bluepad32 to support various gamepad controllers for intuitive control.
+ * 
+ * Components:
+ * - Motion_Control: Processes joystick inputs to compute the target motor speeds.
+ * - Set_Motor_Output: Manages individual motor speeds based on computed targets.
+ * - Motor_Control: Coordinates the updating of all motors' outputs.
+ * - NeoPixel_SetColour: Manages LED colors to reflect different operational statuses.
+ * - Controller Connection Management: Handles the connection and disconnection events for gamepad controllers.
+ * 
+ * Usage:
+ * To deploy this project, ensure that the LoR library is downloaded and installed in your Arduino environment.
+ * The project is configured for ESP32-based controllers, leveraging multitasking capabilities to handle
+ * multiple operations concurrently. Adjust the motor and pin configurations as necessary to match your hardware setup.
+ * 
+ * Setup:
+ * - Ensure all necessary libraries are included and the hardware connections are correctly configured.
+ * - For detailed library usage and additional functionality, refer to the LoR library documentation.
+ * - Install ESP32 boards through board manager. Must include this link in file/preferences https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+ * - Install BluePad32 boards through board manager. Must include this link in file/preferences https://raw.githubusercontent.com/ricardoquesada/esp32-arduino-lib-builder/master/bluepad32_files/package_esp32_bluepad32_index.json
+ * - The code is designed to be uploaded to an ESP32 controller.
+ * - Target board: Choose the bluepad version of the "ESP32 dev module"
+ *
+ * Author:
+ * Dave Barratt
+ * Khushi Tailor
+ * 
+ * Date:
+ * JUNE 2 2024
+ */
 
-#include "LoR.h"  // LoR Library, install from arduino library manager - by Lord of Robots
-
-// IO Interface Definitions
-#define LED_DataPin 12
-#define LED_COUNT 36
-#define SwitchPin 34
-#define channel1Pin 16
-#define channel2Pin 17
-#define channel3Pin 21
-#define channel4Pin 22
-#define servo1Pin 16
-#define servo2Pin 17
-#define servo3Pin 21
-#define servo4Pin 22
-
-// Motor Pin Definitions
-#define motorPin_M1_A 26
-#define motorPin_M1_B 18
-#define motorPin_M2_A 14
-#define motorPin_M2_B 5
-#define motorPin_M3_A 15
-#define motorPin_M3_B 33
-#define motorPin_M4_A 23
-#define motorPin_M4_B 19
-#define motorPin_M5_A 25
-#define motorPin_M5_B 27
-#define motorPin_M6_A 4
-#define motorPin_M6_B 32
-#define MotorEnablePin 13
-
-const int motorPins_A[] = { motorPin_M1_A, motorPin_M2_A, motorPin_M3_A, motorPin_M4_A, motorPin_M5_A, motorPin_M6_A };
-const int motorPins_B[] = { motorPin_M1_B, motorPin_M2_B, motorPin_M3_B, motorPin_M4_B, motorPin_M5_B, motorPin_M6_B };
-
-// Motor PWM Configuration Definitions
-const int Motor_M1_A = 0;
-const int Motor_M1_B = 1;
-const int Motor_M2_A = 2;
-const int Motor_M2_B = 3;
-const int Motor_M3_A = 4;
-const int Motor_M3_B = 5;
-const int Motor_M4_A = 6;
-const int Motor_M4_B = 7;
-const int Motor_M5_A = 8;
-const int Motor_M5_B = 9;
-const int Motor_M6_A = 10;
-const int Motor_M6_B = 11;
-const int MOTOR_PWM_Channel_A[] = { Motor_M1_A, Motor_M2_A, Motor_M3_A, Motor_M4_A, Motor_M5_A, Motor_M6_A };
-const int MOTOR_PWM_Channel_B[] = { Motor_M1_B, Motor_M2_B, Motor_M3_B, Motor_M4_B, Motor_M5_B, Motor_M6_B };
-const int PWM_FREQUENCY = 20000;
-const int PWM_RESOLUTION = 8;
+#include <LoR.h> // Install via Library manager, by Lord of Robots
 
 //////////////////////////////////////////////////////////////////////////
 /////             Serial  config and functions                        /////
@@ -93,6 +84,7 @@ void INIT_GPIO() {
   //Motor test tones
   Start_Tone();
 }
+
 // PWM CONFIG ------------------------------------------------------------
 // configure LED PWM functionalitites
 void INIT_PWM() {
@@ -346,8 +338,6 @@ void processGamePad() {
 ///////////////////////////////////////////////////////////////////////
 //                          Main SETUP                               //
 ///////////////////////////////////////////////////////////////////////
-
-
 
 // Set up pins, LED PWM functionalities and begin PS4 controller, Serial and Serial2 communication
 void setup() {
