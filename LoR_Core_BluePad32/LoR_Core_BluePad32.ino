@@ -1,17 +1,15 @@
-#include "LoR.h" // Download library zip from https://github.com/LordofRobots/LoR and install using "Add ZIP library" under menu sketch/include library
+#include <Bluepad32.h>
+#include <Adafruit_NeoPixel.h>
 
 // IO Interface Definitions
 #define LED_DataPin 12
 #define LED_COUNT 36
 #define SwitchPin 34
+#define MotorEnablePin 13
 #define channel1Pin 16
 #define channel2Pin 17
 #define channel3Pin 21
 #define channel4Pin 22
-#define servo1Pin 16
-#define servo2Pin 17
-#define servo3Pin 21
-#define servo4Pin 22
 
 // Motor Pin Definitions
 #define motorPin_M1_A 26
@@ -49,31 +47,24 @@ const int MOTOR_PWM_Channel_B[] = { Motor_M1_B, Motor_M2_B, Motor_M3_B, Motor_M4
 const int PWM_FREQUENCY = 20000;
 const int PWM_RESOLUTION = 8;
 
-//////////////////////////////////////////////////////////////////////////
-/////                    Motion Control                              /////
-//////////////////////////////////////////////////////////////////////////
-// Process joystick input and calculate motor speeds - Mecanum control
-// Joystick control variables
-const int DEAD_BAND = 60;
+// Process joystick input and calculate motor speeds
+const int DEAD_BAND = 50;
 const float TURN_RATE = 1.5;
-bool MecanumDrive_Enabled = false;
 int Motor_FrontLeft_SetValue, Motor_FrontRight_SetValue, Motor_BackLeft_SetValue, Motor_BackRight_SetValue = 0;
 void Motion_Control(int LY_Axis, int LX_Axis, int RX_Axis) {
   int FrontLeft_TargetValue, FrontRight_TargetValue, BackLeft_TargetValue, BackRight_TargetValue = 0;
-  int ForwardBackward_Axis = LY_Axis;
-  int StrafeLeftRight_Axis = LX_Axis;
-  int TurnLeftRight_Axis = RX_Axis;
+  int ForwardBackward_Axis = -LY_Axis;
+  int TurnLeftRight_Axis = -RX_Axis;
 
   //Set deadband
   if (abs(ForwardBackward_Axis) < DEAD_BAND) ForwardBackward_Axis = 0;
-  if (abs(StrafeLeftRight_Axis) < DEAD_BAND) StrafeLeftRight_Axis = 0;
   if (abs(TurnLeftRight_Axis) < DEAD_BAND) TurnLeftRight_Axis = 0;
 
   //Calculate strafe values
-  FrontLeft_TargetValue = -ForwardBackward_Axis + (StrafeLeftRight_Axis * MecanumDrive_Enabled);
-  BackLeft_TargetValue = -ForwardBackward_Axis - (StrafeLeftRight_Axis * MecanumDrive_Enabled);
-  FrontRight_TargetValue = ForwardBackward_Axis + (StrafeLeftRight_Axis * MecanumDrive_Enabled);
-  BackRight_TargetValue = ForwardBackward_Axis - (StrafeLeftRight_Axis * MecanumDrive_Enabled);
+  FrontLeft_TargetValue = -ForwardBackward_Axis;
+  BackLeft_TargetValue = -ForwardBackward_Axis;
+  FrontRight_TargetValue = ForwardBackward_Axis;
+  BackRight_TargetValue = ForwardBackward_Axis;
 
   //calculate rotation values
   if (abs(TurnLeftRight_Axis) > DEAD_BAND) {
@@ -95,6 +86,7 @@ void Motion_Control(int LY_Axis, int LX_Axis, int RX_Axis) {
   Motor_BackLeft_SetValue = SlewRateFunction(BackLeft_TargetValue, Motor_BackLeft_SetValue);
   Motor_BackRight_SetValue = SlewRateFunction(BackRight_TargetValue, Motor_BackRight_SetValue);
 }
+
 // Function to handle slew rate for motor speed ramping
 // Slew rate for ramping motor speed
 const int SLEW_RATE_MS = 1;
@@ -112,7 +104,7 @@ const int MAX_SPEED = 255;
 const int MIN_SPEED = -255;
 const int MIN_STARTING_SPEED = 140;
 const int STOP = 0;
-bool INVERT = true;
+bool INVERT = false;
 void Set_Motor_Output(int Output, int Motor_ChA, int Motor_ChB) {
   if (INVERT) Output = -Output;
   Output = constrain(Output, -512, 512);
@@ -286,12 +278,11 @@ void processControllers() {
   }
 }
 
-///////////////////////////////////////////////////////////////////////
-//                    Bluepad32 Setup                                //
-///////////////////////////////////////////////////////////////////////
+// Set up pins, LED PWM functionalities and begin PS4 controller, Serial and Serial2 communication
+void setup() {
+  Serial.begin(115200);
 
-void Setup_BluePad32(){
-const uint8_t* addr = BP32.localBdAddress();
+  const uint8_t* addr = BP32.localBdAddress();
   Serial.printf("BD Addr: %2X:%2X:%2X:%2X:%2X:%2X\n", addr[0], addr[1], addr[2], addr[3], addr[4], addr[5]);
 
   // Setup the Bluepad32 callbacks
@@ -302,7 +293,7 @@ const uint8_t* addr = BP32.localBdAddress();
   // Calling "forgetBluetoothKeys" in setup() just as an example.
   // Forgetting Bluetooth keys prevents "paired" gamepads to reconnect.
   // But it might also fix some connection / re-connection issues.
-  //BP32.forgetBluetoothKeys();
+  // BP32.forgetBluetoothKeys();
 
   // Enables mouse / touchpad support for gamepads that support them.
   // When enabled, controllers like DualSense and DualShock4 generate two connected devices:
@@ -311,14 +302,6 @@ const uint8_t* addr = BP32.localBdAddress();
   // By default, it is disabled.
   BP32.enableVirtualDevice(false);
 
-}
-
-// Set up pins, LED PWM functionalities and begin PS4 controller, Serial and Serial2 communication
-void setup() {
-  Serial.begin(115200);
-  LoR.begin();  // Initialize the LoR library
-  Setup_BluePad32();
-  
   // Set up the pins
   pinMode(LED_DataPin, OUTPUT);
   pinMode(SwitchPin, INPUT_PULLUP);
