@@ -1,3 +1,19 @@
+/*
+ * Minibot Control Code for ESP32
+ * 
+ * This program interfaces with an ESP32 to control a minibot using a Bluetooth gamepad. 
+ * It utilizes the Bluepad32 library for gamepad communication and the Adafruit NeoPixel library 
+ * to control an LED strip. The code handles motor control through PWM channels and includes functions 
+ * for joystick input processing, motor speed ramping, and LED color management.
+ * 
+ * Key Features:
+ * - Bluetooth gamepad connection and input processing
+ * - Motor control with PWM signal generation
+ * - LED strip color control with NeoPixel library
+ * - Slew rate control for smooth motor speed changes
+ * - Start-up tone and LED indications for status
+ */
+
 #include <Bluepad32.h>
 #include <Adafruit_NeoPixel.h>
 
